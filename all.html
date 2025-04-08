@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html lang="ar" >
+<head>
+    <link rel="icon" href="assests/logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#16181D">
+    <meta name="description" content="الخادم الأول في الشرق الأوسط من حيث الجوده ولأول مره نقدم طريقة لعب جديده علي مستوى خوادم ام تي اي ادخل واستمتع معنا">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="assests/style.css">
+    <link rel="stylesheet" href="assests/shop.css">
+    <link rel="stylesheet" href="assests/nav.css">
+    <title>𝘿𝙯𝙖𝙮𝙚𝙧 𝘾𝙞𝙩𝙮</title>
+</head>
+<body >
+    <div class="ulg">
+
+    <nav>
+    <div class="ulg-logo">
+        <img src="assests/logo.png" alt="future">
+        <span>𝘿𝙯𝙖𝙮𝙚𝙧 𝘾𝙞𝙩𝙮</span>
+    </div>
+    <ul class="urls">
+        
+            <li>
+                <a href="index.html">
+                    <span>
+                        Main                    </span>
+                </a>
+            </li>
+
+
+
+            <li>
+                <a href="https://discord.gg/PSTjsaWp" target="_blank">
+                    <span>
+                        Discord                   </span>
+                </a>
+            </li>
+
+
+
+            <li class="menu">
+                <a>
+                    <span>Store</span>
+                    <span><i class="bi bi-arrow-down-short"></i></span>
+                    <div class="desc">
+                        <a href="ids.html">قسم الايديهات الخاصة</a>
+                        <a href="factions.html">قسم حزمة الاسلحة </a>
+                        <a href="cars.html">قسم المركبات</a>
+                        <a href="money.html">قسم الاموال</a>
+                    </div>
+                </a>
+            </li>
+            
+        </nav>
+    </header>
+    <div class="sidebar">
+        <a href="all.html" onclick="filterProducts('all')">السكينات الخاصة </a>
+        <a href="cars.html" onclick="filterProducts('cars')">المركبات</a>
+        <a href="ids.html" onclick="filterProducts('ids')">الايديهات الخاصة</a>
+        <a href="money.html" onclick="filterProducts('money')">الاموال</a>
+        <a href="factions.html" onclick="filterProducts('factions')">حزمة الاسلحة </a>
+    </div>
+
+    
+     <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePurchaseForm()">&times;</span>
+            <h2>نموذج الشراء</h2>
+            <form id="purchaseForm">
+                <label for="discordId">إيدي الخاص بك في الخادم :</label>
+                <input type="text" id="discordId" name="discordId" required>
+
+                <label for="accountId">اسم حساب الديسكورد :</label>
+                <input type="text" id="accountId" name="accountId" required>
+
+                <label for="product">المنتج :</label>
+                <input type="text" id="product" name="product" readonly>
+
+                <button type="submit">إرسال</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const webhookURL ="https://discord.com/api/webhooks/1358882762198880406/es7MUAceT3WVQnTjOff95v_YEUPgHE8-9Gd-604ztkDAYWHbzWphoWCQillQLhC-nUgk"; // استبدل هذا بالـ Webhook URL الخاص بك
+
+        function openPurchaseForm(productName) {
+            document.getElementById('product').value = productName;
+            document.getElementById('purchaseModal').style.display = "block";
+            updateSubmitButtonStatus(); 
+        }
+
+        function closePurchaseForm() {
+            document.getElementById('purchaseModal').style.display = "none";
+        }
+
+        function filterProducts(category) {
+            const allProducts = document.querySelectorAll('.product-card');
+            if (category === 'all') {
+                allProducts.forEach(product => product.style.display = 'block');
+            } else {
+                allProducts.forEach(product => {
+                    if (product.getAttribute('data-product') === category) {
+                        product.style.display = 'block';
+                    } else {
+                        product.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        function updateSubmitButtonStatus() {
+            const submitButton = document.getElementById('purchaseForm').querySelector('button[type="submit"]');
+            const lastSubmitTime = localStorage.getItem('lastSubmitTimePurchase');
+            const currentTime = new Date().getTime();
+            const cooldownTime = 1 * 60 * 60 * 1000; 
+
+            if (lastSubmitTime) {
+                const timePassed = currentTime - lastSubmitTime;
+
+                if (timePassed < cooldownTime) {
+                    const timeLeft = Math.ceil((cooldownTime - timePassed) / 1000);
+                    submitButton.disabled = true;
+                    submitButton.innerText = `يمكنك الإرسال بعد ${Math.floor(timeLeft / 320)} دقيقة و ${timeLeft % 60} ثانية`;
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.innerText = 'إرسال';
+                }
+            } else {
+                submitButton.disabled = false;
+                submitButton.innerText = 'إرسال';
+            }
+        }
+
+        document.getElementById('purchaseForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            if (submitButton.disabled) return;
+
+            const discordId = document.getElementById('discordId').value;
+            const accountId = document.getElementById('accountId').value;
+            const product = document.getElementById('product').value;
+
+            const webhookData = {
+                content: `طلب شراء جديد\n\n**إيدي الديسكورد:** ${discordId}\n**إيدي الحساب:** ${accountId}\n**المنتج:** ${product}`
+            };
+
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(webhookData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('تم إرسال طلب الشراء بنجاح!');
+                    submitButton.disabled = true;
+                    submitButton.innerText = 'تم الإرسال. يمكنك الإرسال مرة أخرى بعد ساعة.';
+                    localStorage.setItem('lastSubmitTimePurchase', new Date().getTime());
+                    closePurchaseForm();
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('حدث خطأ:', error);
+                alert('حدث خطأ أثناء إرسال طلب الشراء.');
+            });
+        });
+    </script>
+
+    
+    <script src="discord.js"></script>
+
+</html>
